@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { type FeedPage, fetchFeedPage } from '@/data/api';
 import { useRemoved } from '@/store/removed';
 
-const FEED_KEY = ['feed'] as const;
+export const FEED_KEY = ['feed'] as const;
 const FIRST_PAGE_KEY = ['feed', 'first-page'] as const;
 
 export function useFeed() {

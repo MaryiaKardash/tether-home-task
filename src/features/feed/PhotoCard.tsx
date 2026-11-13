@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { memo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { photoUrl } from '@/data/images';
 import type { Photo } from '@/domain/types';
@@ -25,20 +26,25 @@ export const PhotoCard = memo(function PhotoCard({ photo, width, colors }: Props
   return (
     <SwipeToRemove photoId={photo.id}>
       <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Image
-          source={{ uri: photoUrl(photo, width) }}
-          recyclingKey={String(photo.id)}
-          cachePolicy="memory-disk"
-          transition={120}
-          style={[
-            styles.image,
-            {
-              aspectRatio: photo.width / photo.height,
-              backgroundColor: placeholderColor(photo.id),
-            },
-          ]}
-          accessibilityIgnoresInvertColors
-        />
+        <Pressable
+          onPress={() =>
+            router.push({ pathname: '/photo/[id]', params: { id: String(photo.id) } })
+          }>
+          <Image
+            source={{ uri: photoUrl(photo, width) }}
+            recyclingKey={String(photo.id)}
+            cachePolicy="memory-disk"
+            transition={120}
+            style={[
+              styles.image,
+              {
+                aspectRatio: photo.width / photo.height,
+                backgroundColor: placeholderColor(photo.id),
+              },
+            ]}
+            accessibilityIgnoresInvertColors
+          />
+        </Pressable>
         <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
           {photo.title}
         </Text>

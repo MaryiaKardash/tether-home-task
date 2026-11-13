@@ -28,6 +28,15 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: colors.background },
           }}>
           <Stack.Screen name="index" options={{ title: 'Photos' }} />
+          <Stack.Screen
+            name="photo/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'transparentModal',
+              animation: 'fade',
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </QueryClientProvider>
