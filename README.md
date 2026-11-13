@@ -145,3 +145,22 @@ asks for its photo at the exact pixel size it will be shown at, cropped to its a
 - Likes and removed cards are kept in memory only and reset when the app restarts.
 - If every loaded card is removed before the next page arrives, the feed shows its empty state
   instead of loading more.
+
+## Improvements
+
+Things I would do next, roughly in order:
+
+- **Keep likes and removed cards** across restarts with zustand's `persist` (MMKV or
+  AsyncStorage), and add an "Undo" snackbar after removing a card.
+- **Load more when the screen runs out of cards.** If every loaded card is removed, fetch the next
+  page instead of showing the empty state.
+- **Collapsible header** that hides while scrolling down and comes back on scroll up, driven by the
+  list's scroll position on the UI thread.
+- **Better placeholders:** BlurHash or ThumbHash previews instead of a flat color while photos
+  load.
+- **Haptics** on like and on remove.
+- **Real backend:** replace `fetchFeedPage` with a cursor-based API and keep the TanStack Query
+  cache on disk so the feed opens instantly offline.
+- **Tests and CI:** unit tests for paging and the stores, end-to-end flows (Maestro) for scrolling,
+  swiping and the detail drag, and frame-rate runs on a low-end Android device (Flashlight) on
+  every pull request.
