@@ -2,6 +2,7 @@ import { type InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/r
 import { useState } from 'react';
 
 import { type FeedPage, fetchFeedPage } from '@/data/api';
+import { useRemoved } from '@/store/removed';
 
 const FEED_KEY = ['feed'] as const;
 const FIRST_PAGE_KEY = ['feed', 'first-page'] as const;
@@ -27,7 +28,9 @@ export function useFeed() {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
-  const items = data?.pages.flatMap((page) => page.items) ?? [];
+  const removed = useRemoved((state) => state.removed);
+  const items =
+    data?.pages.flatMap((page) => page.items).filter((photo) => !removed[photo.id]) ?? [];
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError && !refreshing) {

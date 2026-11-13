@@ -7,9 +7,11 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { Photo } from '@/domain/types';
+import { useRemoved } from '@/store/removed';
 import { useColors } from '@/theme/colors';
 
 import { CARD_MARGIN, PhotoCard } from './PhotoCard';
@@ -35,6 +37,7 @@ export function FeedScreen() {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const hasRemovedAny = useRemoved((state) => Object.keys(state.removed).length > 0);
   const cardWidth = width - insets.left - insets.right - CARD_MARGIN * 2;
 
   const renderItem: ListRenderItem<Photo> = ({ item }) => (
@@ -69,7 +72,12 @@ export function FeedScreen() {
         Could not refresh the feed. Tap to try again.
       </Text>
     </Pressable>
-  ) : null;
+  ) : hasRemovedAny ? null : (
+    <View style={styles.tip}>
+      <Ionicons name="swap-horizontal" size={16} color={colors.muted} />
+      <Text style={{ color: colors.muted }}>Swipe a card left or right to remove it</Text>
+    </View>
+  );
 
   const footer = loadingMore ? (
     <ActivityIndicator style={styles.footer} />
@@ -94,7 +102,7 @@ export function FeedScreen() {
       onRefresh={refresh}
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{
-        paddingTop: insets.top + CARD_MARGIN,
+        paddingTop: CARD_MARGIN,
         paddingBottom: insets.bottom,
         paddingLeft: insets.left,
         paddingRight: insets.right,
@@ -119,6 +127,13 @@ const styles = StyleSheet.create({
     marginBottom: CARD_MARGIN,
     padding: 12,
     borderRadius: 14,
+  },
+  tip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: CARD_MARGIN,
   },
   footer: {
     padding: 16,

@@ -6,6 +6,7 @@ const light = {
   text: '#111111',
   muted: '#6b6b70',
   accent: '#009393',
+  danger: '#e5484d',
 };
 
 const dark: typeof light = {
@@ -14,6 +15,7 @@ const dark: typeof light = {
   text: '#f2f2f7',
   muted: '#9a9aa0',
   accent: '#30c9c9',
+  danger: '#ff6369',
 };
 
 export type Colors = typeof light;
