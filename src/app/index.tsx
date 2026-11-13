@@ -1,17 +1,3 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { FeedScreen } from '@/features/feed/FeedScreen';
 
-export default function FeedRoute() {
-  return (
-    <View style={styles.container}>
-      <Text>Feed</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default FeedScreen;
