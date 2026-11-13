@@ -6,6 +6,8 @@ import { photoUrl } from '@/data/images';
 import type { Photo } from '@/domain/types';
 import type { Colors } from '@/theme/colors';
 
+import { LikeButton } from './LikeButton';
+
 export const CARD_MARGIN = 12;
 
 interface Props {
@@ -38,7 +40,10 @@ export const PhotoCard = memo(function PhotoCard({ photo, width, colors }: Props
       <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
         {photo.title}
       </Text>
-      <Text style={[styles.meta, { color: colors.muted }]}>#{photo.id}</Text>
+      <View style={styles.footer}>
+        <Text style={[styles.meta, { color: colors.muted }]}>#{photo.id}</Text>
+        <LikeButton photoId={photo.id} colors={colors} />
+      </View>
     </View>
   );
 });
@@ -59,10 +64,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 10,
   },
-  meta: {
-    fontSize: 13,
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingTop: 2,
-    paddingBottom: 12,
+    paddingBottom: 10,
+  },
+  meta: {
+    fontSize: 13,
   },
 });
