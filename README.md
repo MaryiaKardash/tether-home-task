@@ -102,12 +102,14 @@ src/
   data/
     mockFeed.ts        builds the 5,000 items and serves them in pages
     images.ts          image URL for a photo at an exact pixel size
+    feedCache.ts       query key for the feed and lookup of a loaded photo by id
   domain/types.ts      FeedItem = Photo | TextPost
   features/
-    feed/              FeedScreen, PhotoCard, TextCard, LikeButton, SwipeToRemove, useFeed
+    feed/              FeedScreen, PhotoCard, TextCard, LikeButton, SwipeToRemove,
+                       FeedStatus (empty, header, footer), useFeed, usePrefetchImages
     detail/            PhotoDetailScreen (drag to dismiss)
   store/               likes and removed cards (zustand)
-  theme/               colors (light/dark) and card layout constants
+  theme/               colors (light/dark), card layout and animation constants
 ```
 
 ## Data
@@ -143,8 +145,6 @@ asks for its photo at the exact pixel size it will be shown at, cropped to its a
 ## Known gaps
 
 - Likes and removed cards are kept in memory only and reset when the app restarts.
-- If every loaded card is removed before the next page arrives, the feed shows its empty state
-  instead of loading more.
 
 ## Improvements
 
@@ -152,8 +152,6 @@ Things I would do next, roughly in order:
 
 - **Keep likes and removed cards** across restarts with zustand's `persist` (MMKV or
   AsyncStorage), and add an "Undo" snackbar after removing a card.
-- **Load more when the screen runs out of cards.** If every loaded card is removed, fetch the next
-  page instead of showing the empty state.
 - **Collapsible header** that hides while scrolling down and comes back on scroll up, driven by the
   list's scroll position on the UI thread.
 - **Better placeholders:** BlurHash or ThumbHash previews instead of a flat color while photos

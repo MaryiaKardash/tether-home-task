@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useColors } from '@/theme/colors';
-import { CARD_MARGIN, CARD_RADIUS } from '@/theme/layout';
+import { CARD_MARGIN, CARD_RADIUS, SPACING } from '@/theme/layout';
 
 interface Props {
   translateX: SharedValue<number>;
@@ -42,12 +42,12 @@ export function SwipeHint({ translateX, threshold, width }: Props) {
       importantForAccessibility="no-hide-descendants"
       accessibilityElementsHidden>
       <Animated.View style={[styles.side, leftSideStyle]}>
-        <Ionicons name="trash-outline" size={22} color="#ffffff" />
-        <Text style={styles.text}>Remove</Text>
+        <Ionicons name="trash-outline" size={22} color={colors.onBackdrop} />
+        <Text style={[styles.text, { color: colors.onBackdrop }]}>Remove</Text>
       </Animated.View>
       <Animated.View style={[styles.side, rightSideStyle]}>
-        <Text style={styles.text}>Remove</Text>
-        <Ionicons name="trash-outline" size={22} color="#ffffff" />
+        <Text style={[styles.text, { color: colors.onBackdrop }]}>Remove</Text>
+        <Ionicons name="trash-outline" size={22} color={colors.onBackdrop} />
       </Animated.View>
     </Animated.View>
   );
@@ -64,15 +64,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.xxl,
   },
   side: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: SPACING.xs,
   },
   text: {
-    color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
   },

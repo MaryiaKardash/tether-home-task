@@ -7,6 +7,8 @@ const light = {
   muted: '#6b6b70',
   accent: '#009393',
   danger: '#e5484d',
+  backdrop: '#000000',
+  onBackdrop: '#ffffff',
 };
 
 const dark: typeof light = {
@@ -16,6 +18,8 @@ const dark: typeof light = {
   muted: '#9a9aa0',
   accent: '#30c9c9',
   danger: '#ff6369',
+  backdrop: '#000000',
+  onBackdrop: '#ffffff',
 };
 
 export type Colors = typeof light;

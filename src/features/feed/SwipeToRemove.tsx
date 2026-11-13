@@ -12,13 +12,12 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { useRemoved } from '@/store/removed';
 import { CARD_MARGIN } from '@/theme/layout';
+import { FLING_VELOCITY, FLY_OUT_DURATION } from '@/theme/motion';
 
 import { SwipeHint } from './SwipeHint';
 
-const REMOVE_VELOCITY = 1000;
-
 interface Props {
-  photoId: number;
+  itemId: number;
   width: number;
   children: ReactNode;
 }
@@ -27,17 +26,17 @@ function remove(id: number) {
   useRemoved.getState().remove(id);
 }
 
-export function SwipeToRemove({ photoId, width: cardWidth, children }: Props) {
+export function SwipeToRemove({ itemId, width: cardWidth, children }: Props) {
   const width = cardWidth + CARD_MARGIN * 2;
   const threshold = width * 0.35;
-  const [showHint, setShowHint] = useRecyclingState(false, [photoId]);
+  const [showHint, setShowHint] = useRecyclingState(false, [itemId]);
   const translateX = useSharedValue(0);
   const swipedId = useSharedValue(-1);
-  const currentId = useSharedValue(photoId);
+  const currentId = useSharedValue(itemId);
 
   useEffect(() => {
-    currentId.set(photoId);
-  }, [currentId, photoId]);
+    currentId.set(itemId);
+  }, [currentId, itemId]);
 
   const pan = usePanGesture({
     activeOffsetX: [-15, 15],
@@ -57,11 +56,11 @@ export function SwipeToRemove({ photoId, width: cardWidth, children }: Props) {
       const id = currentId.get();
       const shouldRemove =
         !event.canceled &&
-        (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > REMOVE_VELOCITY);
+        (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > FLING_VELOCITY);
       if (shouldRemove) {
         const direction = event.translationX + event.velocityX < 0 ? -1 : 1;
         translateX.set(
-          withTiming(direction * width, { duration: 180 }, (finished) => {
+          withTiming(direction * width, { duration: FLY_OUT_DURATION }, (finished) => {
             if (finished) scheduleOnRN(remove, id);
           }),
         );
@@ -76,7 +75,7 @@ export function SwipeToRemove({ photoId, width: cardWidth, children }: Props) {
   });
 
   const cardStyle = useAnimatedStyle(() => {
-    const x = swipedId.get() === photoId ? translateX.get() : 0;
+    const x = swipedId.get() === itemId ? translateX.get() : 0;
     return { transform: [{ translateX: x }] };
   });
 
@@ -86,8 +85,8 @@ export function SwipeToRemove({ photoId, width: cardWidth, children }: Props) {
       <GestureDetector gesture={pan}>
         <Animated.View
           style={cardStyle}
-          accessibilityActions={[{ name: 'remove', label: 'Remove photo' }]}
-          onAccessibilityAction={() => remove(photoId)}>
+          accessibilityActions={[{ name: 'remove', label: 'Remove' }]}
+          onAccessibilityAction={() => remove(itemId)}>
           {children}
         </Animated.View>
       </GestureDetector>

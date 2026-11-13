@@ -5,8 +5,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { photoUrl } from '@/data/images';
 import type { Photo } from '@/domain/types';
-import type { Colors } from '@/theme/colors';
-import { CARD_MARGIN, CARD_RADIUS } from '@/theme/layout';
+import { useColors } from '@/theme/colors';
+import { CARD_MARGIN, CARD_RADIUS, SPACING } from '@/theme/layout';
 
 import { LikeButton } from './LikeButton';
 import { SwipeToRemove } from './SwipeToRemove';
@@ -14,18 +14,20 @@ import { SwipeToRemove } from './SwipeToRemove';
 interface Props {
   photo: Photo;
   width: number;
-  colors: Colors;
 }
 
 function placeholderColor(id: number): string {
   return `hsl(${(id * 47) % 360}, 25%, 70%)`;
 }
 
-export const PhotoCard = memo(function PhotoCard({ photo, width, colors }: Props) {
+export const PhotoCard = memo(function PhotoCard({ photo, width }: Props) {
+  const colors = useColors();
   return (
-    <SwipeToRemove photoId={photo.id} width={width}>
+    <SwipeToRemove itemId={photo.id} width={width}>
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Open photo: ${photo.title}`}
           onPress={() =>
             router.push({ pathname: '/photo/[id]', params: { id: String(photo.id) } })
           }>
@@ -49,7 +51,7 @@ export const PhotoCard = memo(function PhotoCard({ photo, width, colors }: Props
         </Text>
         <View style={styles.footer}>
           <Text style={[styles.meta, { color: colors.muted }]}>#{photo.id}</Text>
-          <LikeButton photoId={photo.id} colors={colors} />
+          <LikeButton itemId={photo.id} />
         </View>
       </View>
     </SwipeToRemove>
@@ -70,16 +72,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    paddingHorizontal: 12,
-    paddingTop: 10,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.md,
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingTop: 2,
-    paddingBottom: 10,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xxs,
+    paddingBottom: SPACING.md,
   },
   meta: {
     fontSize: 13,

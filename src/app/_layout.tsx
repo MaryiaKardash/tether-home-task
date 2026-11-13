@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColors } from '@/theme/colors';
@@ -18,7 +19,7 @@ export default function RootLayout() {
   const colors = useColors();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.root}>
       <QueryClientProvider client={queryClient}>
         <Stack
           screenOptions={{
@@ -27,7 +28,7 @@ export default function RootLayout() {
             headerTitleStyle: { fontWeight: '700' },
             contentStyle: { backgroundColor: colors.background },
           }}>
-          <Stack.Screen name="index" options={{ title: 'Photos' }} />
+          <Stack.Screen name="index" options={{ title: 'Feed' }} />
           <Stack.Screen
             name="photo/[id]"
             options={{
@@ -43,3 +44,9 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

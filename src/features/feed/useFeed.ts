@@ -1,10 +1,10 @@
-import { type InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
-import { type FeedPage, fetchFeedPage } from '@/data/mockFeed';
+import { FEED_KEY, type FeedData } from '@/data/feedCache';
+import { fetchFeedPage } from '@/data/mockFeed';
 import { useRemoved } from '@/store/removed';
 
-export const FEED_KEY = ['feed'] as const;
 const FIRST_PAGE_KEY = ['feed', 'first-page'] as const;
 
 export function useFeed() {
@@ -29,8 +29,21 @@ export function useFeed() {
   });
 
   const removed = useRemoved((state) => state.removed);
-  const items =
-    data?.pages.flatMap((page) => page.items).filter((photo) => !removed[photo.id]) ?? [];
+  const items = data?.pages.flatMap((page) => page.items).filter((item) => !removed[item.id]) ?? [];
+  const allRemoved = data !== undefined && items.length === 0;
+
+  useEffect(() => {
+    if (allRemoved && hasNextPage && !isFetchingNextPage && !isFetchNextPageError && !refreshing) {
+      void fetchNextPage();
+    }
+  }, [
+    allRemoved,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    refreshing,
+    fetchNextPage,
+  ]);
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError && !refreshing) {
@@ -48,7 +61,7 @@ export function useFeed() {
         queryFn: () => fetchFeedPage(0),
         staleTime: 0,
       });
-      queryClient.setQueryData<InfiniteData<FeedPage, number>>(FEED_KEY, {
+      queryClient.setQueryData<FeedData>(FEED_KEY, {
         pages: [first],
         pageParams: [0],
       });
@@ -61,8 +74,9 @@ export function useFeed() {
 
   return {
     items,
-    loading: isPending,
-    loadFailed: isError && !data,
+    loading: isPending || (allRemoved && isFetchingNextPage),
+    loadFailed: (isError && !data) || (allRemoved && isFetchNextPageError),
+    exhausted: allRemoved && !hasNextPage,
     refreshing,
     refreshFailed,
     loadingMore: isFetchingNextPage,
@@ -70,6 +84,6 @@ export function useFeed() {
     loadMore,
     refresh,
     retryLoadMore: () => void fetchNextPage(),
-    reload: () => void refetch(),
+    reload: () => void (allRemoved ? fetchNextPage() : refetch()),
   };
 }

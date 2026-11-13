@@ -9,15 +9,16 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useIsLiked, useLikes } from '@/store/likes';
-import type { Colors } from '@/theme/colors';
+import { useColors } from '@/theme/colors';
+import { HIT_SLOP } from '@/theme/layout';
 
 interface Props {
-  photoId: number;
-  colors: Colors;
+  itemId: number;
 }
 
-export function LikeButton({ photoId, colors }: Props) {
-  const liked = useIsLiked(photoId);
+export function LikeButton({ itemId }: Props) {
+  const colors = useColors();
+  const liked = useIsLiked(itemId);
   const scale = useSharedValue(1);
 
   const heartStyle = useAnimatedStyle(() => ({
@@ -28,15 +29,15 @@ export function LikeButton({ photoId, colors }: Props) {
     if (!liked) {
       scale.set(withSequence(withTiming(1.4, { duration: 90 }), withSpring(1)));
     }
-    useLikes.getState().toggle(photoId);
+    useLikes.getState().toggle(itemId);
   };
 
   return (
     <Pressable
       onPress={onPress}
-      hitSlop={12}
+      hitSlop={HIT_SLOP}
       accessibilityRole="button"
-      accessibilityLabel={liked ? 'Unlike photo' : 'Like photo'}
+      accessibilityLabel={liked ? 'Unlike' : 'Like'}
       accessibilityState={{ selected: liked }}>
       <Animated.View style={heartStyle}>
         <Ionicons
