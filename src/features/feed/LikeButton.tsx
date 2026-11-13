@@ -18,7 +18,6 @@ interface Props {
 
 export function LikeButton({ photoId, colors }: Props) {
   const liked = useIsLiked(photoId);
-  const toggle = useLikes((state) => state.toggle);
   const scale = useSharedValue(1);
 
   const heartStyle = useAnimatedStyle(() => ({
@@ -29,7 +28,7 @@ export function LikeButton({ photoId, colors }: Props) {
     if (!liked) {
       scale.set(withSequence(withTiming(1.4, { duration: 90 }), withSpring(1)));
     }
-    toggle(photoId);
+    useLikes.getState().toggle(photoId);
   };
 
   return (

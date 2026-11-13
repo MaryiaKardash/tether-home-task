@@ -15,8 +15,9 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import type { FeedPage } from '@/data/api';
+import type { FeedPage } from '@/data/mockFeed';
 import { photoUrl } from '@/data/images';
+import type { Photo } from '@/domain/types';
 import { FEED_KEY } from '@/features/feed/useFeed';
 import { CARD_MARGIN } from '@/theme/layout';
 
@@ -37,7 +38,7 @@ export function PhotoDetailScreen() {
   const photo = queryClient
     .getQueryData<InfiniteData<FeedPage, number>>(FEED_KEY)
     ?.pages.flatMap((page) => page.items)
-    .find((item) => item.id === Number(id));
+    .find((item): item is Photo => item.kind === 'photo' && item.id === Number(id));
 
   const pan = usePanGesture({
     activeOffsetY: [-10, 10],

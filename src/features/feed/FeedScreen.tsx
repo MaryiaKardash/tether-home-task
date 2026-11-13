@@ -1,4 +1,5 @@
-import { FlashList, type ListRenderItem } from '@shopify/flash-list';
+import { FlashList, type ListRenderItem, type ViewToken } from '@shopify/flash-list';
+import { Image } from 'expo-image';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,15 +11,22 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { Photo } from '@/domain/types';
+import { photoUrl } from '@/data/images';
+import type { FeedItem } from '@/domain/types';
 import { useRemoved } from '@/store/removed';
 import { useColors } from '@/theme/colors';
+import { CARD_MARGIN, CARD_RADIUS } from '@/theme/layout';
 
-import { CARD_MARGIN, PhotoCard } from './PhotoCard';
+import { PhotoCard } from './PhotoCard';
+import { TextCard } from './TextCard';
 import { useFeed } from './useFeed';
 
-const keyExtractor = (photo: Photo) => String(photo.id);
-const getItemType = (photo: Photo) => photo.height;
+const keyExtractor = (item: FeedItem) => String(item.id);
+const getItemType = (item: FeedItem) => item.kind;
+
+const PREFETCH_FROM = 3;
+const PREFETCH_AHEAD = 6;
+const prefetched = new Set<string>();
 
 export function FeedScreen() {
   const {
@@ -40,10 +48,26 @@ export function FeedScreen() {
   const hasRemovedAny = useRemoved((state) => Object.keys(state.removed).length > 0);
   const cardWidth = width - insets.left - insets.right - CARD_MARGIN * 2;
 
-  const renderItem: ListRenderItem<Photo> = ({ item }) => (
-    <PhotoCard photo={item} width={cardWidth} colors={colors} />
-  );
+  const renderItem: ListRenderItem<FeedItem> = ({ item }) =>
+    item.kind === 'photo' ? (
+      <PhotoCard photo={item} width={cardWidth} colors={colors} />
+    ) : (
+      <TextCard post={item} width={cardWidth} colors={colors} />
+    );
   const extraData = { cardWidth, colors };
+
+  const onViewableItemsChanged = ({ viewableItems }: { viewableItems: ViewToken<FeedItem>[] }) => {
+    const lastVisible = viewableItems.at(-1)?.index;
+    if (lastVisible == null) return;
+    const urls = items
+      .slice(lastVisible + PREFETCH_FROM, lastVisible + PREFETCH_FROM + PREFETCH_AHEAD)
+      .filter((item) => item.kind === 'photo')
+      .map((photo) => photoUrl(photo, cardWidth))
+      .filter((url) => !prefetched.has(url));
+    if (urls.length === 0) return;
+    urls.forEach((url) => prefetched.add(url));
+    void Image.prefetch(urls, 'memory-disk');
+  };
 
   if (items.length === 0) {
     return (
@@ -90,14 +114,15 @@ export function FeedScreen() {
   ) : null;
 
   return (
-    <FlashList<Photo>
+    <FlashList<FeedItem>
       data={items}
       extraData={extraData}
       keyExtractor={keyExtractor}
       getItemType={getItemType}
       renderItem={renderItem}
       onEndReached={loadMore}
-      onEndReachedThreshold={1}
+      onEndReachedThreshold={2}
+      onViewableItemsChanged={onViewableItemsChanged}
       refreshing={refreshing}
       onRefresh={refresh}
       style={{ backgroundColor: colors.background }}
@@ -126,7 +151,7 @@ const styles = StyleSheet.create({
     marginHorizontal: CARD_MARGIN,
     marginBottom: CARD_MARGIN,
     padding: 12,
-    borderRadius: 14,
+    borderRadius: CARD_RADIUS,
   },
   tip: {
     flexDirection: 'row',

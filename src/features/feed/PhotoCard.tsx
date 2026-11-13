@@ -6,11 +6,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { photoUrl } from '@/data/images';
 import type { Photo } from '@/domain/types';
 import type { Colors } from '@/theme/colors';
+import { CARD_MARGIN, CARD_RADIUS } from '@/theme/layout';
 
 import { LikeButton } from './LikeButton';
 import { SwipeToRemove } from './SwipeToRemove';
-
-export const CARD_MARGIN = 12;
 
 interface Props {
   photo: Photo;
@@ -24,7 +23,7 @@ function placeholderColor(id: number): string {
 
 export const PhotoCard = memo(function PhotoCard({ photo, width, colors }: Props) {
   return (
-    <SwipeToRemove photoId={photo.id}>
+    <SwipeToRemove photoId={photo.id} width={width}>
       <View style={[styles.card, { backgroundColor: colors.card }]}>
         <Pressable
           onPress={() =>
@@ -61,11 +60,12 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: CARD_MARGIN,
     marginBottom: CARD_MARGIN,
-    borderRadius: 14,
-    overflow: 'hidden',
+    borderRadius: CARD_RADIUS,
   },
   image: {
     width: '100%',
+    borderTopLeftRadius: CARD_RADIUS,
+    borderTopRightRadius: CARD_RADIUS,
   },
   title: {
     fontSize: 15,
